@@ -1,7 +1,10 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-Development in process by Luis R. Alicea Ortiz
-2023
+### Development in process by Luis R. Alicea Ortiz
+
+### As part of developer portfolio
+
+### 2023
 
 ## Getting Started
 
