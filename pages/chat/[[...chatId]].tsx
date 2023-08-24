@@ -14,9 +14,11 @@ export default function ChatPage() {
       content: string;
     }[]
   >([]);
+  const [generatingResponse, setGeneratingResponse] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setGeneratingResponse(true);
     setNewChatMessages((prev) => {
       const newChatMessages = [
         ...prev,
@@ -28,7 +30,7 @@ export default function ChatPage() {
       ];
       return newChatMessages;
     });
-    console.log(messageText);
+    setMessageText("");
     const res = await fetch("/api/chat/sendMessage", {
       method: "POST",
       headers: {
@@ -47,6 +49,7 @@ export default function ChatPage() {
       console.log(message);
       setIncomingMessage((s) => `${s}${message.content}`);
     });
+    setGeneratingResponse(false);
   };
 
   return (
@@ -57,7 +60,7 @@ export default function ChatPage() {
 
       <div className="grid h-screen grid-cols-[260px_1fr]">
         <ChatSidebar />
-        <div className="flex flex-col bg-[#3d3d3d]">
+        <div className="flex flex-col bg-[#3d3d3d] w-full">
           <div className="flex-1 text-white">
             {newChatMessages.map((message) => (
               <Message
@@ -73,12 +76,12 @@ export default function ChatPage() {
           </div>
           <footer className="bg-[#333333] p-9">
             <form onSubmit={handleSubmit}>
-              <fieldset className="flex gap-3">
+              <fieldset className="flex gap-3" disabled={generatingResponse}>
                 <textarea
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
                   className="w-full resize-none rounded-md bg-[#3d3d3d] px-3 py-1 text-white focus:border-[#FFFFFF] focus:bg-[#474747] focus:outline focus:outline-[#ffffff]"
-                  placeholder="Send a message..."
+                  placeholder={generatingResponse ? "" : "Type a message..."}
                 />
                 <button type="submit" className="btn">
                   {/* <Image id="send-button" src={Send} alt={"Image"} /> */}
