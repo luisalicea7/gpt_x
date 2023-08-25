@@ -23,7 +23,7 @@ export const Message = ({
 
   return (
     <div
-      className={`grid grid-cols-[30px_1fr] gap-7 p-5 ${
+      className={`grid grid-cols-[30px_1fr] gap-2 p-5 ${
         role === "assistant" ? "bg-[#5C5C5C]" : ""
       } `}>
       <div>
@@ -43,7 +43,7 @@ export const Message = ({
           </div>
         )}
       </div>
-      <div className="max-w-5xl prose prose-invert">
+      <div className="max-w-none prose prose-invert px-9">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     </div>
