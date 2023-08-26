@@ -1,7 +1,3 @@
-import { UserButton, clerkClient } from "@clerk/nextjs";
-import { Clerk, buildClerkProps, getAuth } from "@clerk/nextjs/server";
-import { profile } from "console";
-import { NextApiRequest, NextApiResponse } from "next";
 import Image from "next/image";
 import { useUser } from "@clerk/nextjs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
