@@ -9,6 +9,18 @@ export const config = {
 export default async function handler(req: Request, res: NextApiResponse) {
     try {
         const { message } = await req.json()
+
+        const res = await fetch("/api/chat/createNewChat", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message }),
+          });
+      
+          const data = await res.json();
+          console.log("NEW CHAT: ", data);
+          
         const stream = await OpenAIEdgeStream(
             "https://api.openai.com/v1/chat/completions", {
                 headers: {
