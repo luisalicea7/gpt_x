@@ -14,4 +14,8 @@
   .side-menu-item {
     @apply m-2 p-2 flex items-center gap-4 rounded-md hover:bg-[#3d3d3d];
   }
+
+  .new-chat-btn {
+    @apply m-2 p-2 flex items-center gap-4 rounded-md bg-[#ffffff] text-[#3d3d3d] hover:bg-[#e0e0e0];
+  }
 }
