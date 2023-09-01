@@ -31,7 +31,8 @@ export default function ChatPage() {
       return newChatMessages;
     });
     setMessageText("");
-    const res = await fetch("/api/chat/createNewChat", {
+
+    const res = await fetch("/api/chat/sendMessage", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,27 +40,16 @@ export default function ChatPage() {
       body: JSON.stringify({ message: messageText }),
     });
 
-    const data = await res.json();
-    console.log("NEW CHAT: ", data);
+    const data = res.body;
+    if (!data) {
+      return;
+    }
 
-    // const res = await fetch("/api/chat/sendMessage", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({ message: messageText }),
-    // });
-    // const data = res.body;
-
-    // if (!data) {
-    //   return;
-    // }
-
-    // const reader = data.getReader();
-    // await streamReader(reader, (message) => {
-    //   console.log(message);
-    //   setIncomingMessage((s) => `${s}${message.content}`);
-    // });
+    const reader = data.getReader();
+    await streamReader(reader, (message) => {
+      console.log(message);
+      setIncomingMessage((s) => `${s}${message.content}`);
+    });
     setGeneratingResponse(false);
   };
 

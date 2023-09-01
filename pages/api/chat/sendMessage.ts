@@ -1,4 +1,4 @@
-import { NextApiResponse } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import { OpenAIEdgeStream } from "openai-edge-stream"
 
 
@@ -7,28 +7,33 @@ export const config = {
 }
 
 export default async function handler(req: Request, res: NextApiResponse) {
+
     try {
-        const { message } = await req.json()
+        const { message } = await req.json();
 
-        const customInitialMessage = {
-            role: "system",
-            content: ""
-        }
+        // const customInitialMessage = {
+        //     role: "system",
+        //     content: ""
+        // }
+        // console.log("header")
 
-        const res = await fetch(`${req.headers.get("origin")}/api/chat/createNewChat`, {
+        console.log("req.headers", req.headers)
+
+        const res = await fetch(
+            `${req.headers.get("origin")}/api/chat/createNewChat`,
+            {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              cookie: req.headers.get("cookie") || "",
+              "content-Type": "application/json",
+                cookie: req.headers.get("cookie") || "",
             },
             body: JSON.stringify({ message }),
           });
       
           const data = await res.json();
-          console.log("NEW CHAT: ", data);
-          const chatId = data._id;
 
-
+        // const chatId = data._id
+    
         const stream = await OpenAIEdgeStream(
             "https://api.openai.com/v1/chat/completions", {
                 headers: {
@@ -43,10 +48,20 @@ export default async function handler(req: Request, res: NextApiResponse) {
                 })
         }, {
             onAfterStream: async ({fullContent}) => {
-
+                // await fetch(`${req.headers.get("Origin")}/api/chat/addMessage2Chat`, {
+                //     method: "POST",
+                //     headers: {
+                //         "content-type": "application/json",
+                //         cookie: req.headers.get("Cookie") || ""
+                //     },
+                //     body: JSON.stringify({
+                //         // chatId,
+                //         role: "assistant",
+                //         content: fullContent,
+                //     })
+                // })
             }
-        }
-        )
+        })
         return new Response(stream)
     } catch (error) {
         console.log("An error ocurred on sendMessage", error)
