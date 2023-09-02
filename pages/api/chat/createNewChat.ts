@@ -1,6 +1,6 @@
 import clientPromise from "@/lib/dbconnect";
-import { getAuth } from "@clerk/nextjs/server";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { buildClerkProps, clerkClient, getAuth } from "@clerk/nextjs/server";
+import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next"
 
 export default async function handler(
   req: NextApiRequest,

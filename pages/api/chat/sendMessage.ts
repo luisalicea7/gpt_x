@@ -1,23 +1,15 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { buildClerkProps, clerkClient, getAuth } from "@clerk/nextjs/server";
+import { GetServerSideProps, NextApiResponse } from "next";
 import { OpenAIEdgeStream } from "openai-edge-stream"
-
 
 export const config = {
     runtime: "edge",
 }
 
-export default async function handler(req: Request, res: NextApiResponse) {
+export default async function handler(req: Request) {
 
     try {
         const { message } = await req.json();
-
-        // const customInitialMessage = {
-        //     role: "system",
-        //     content: ""
-        // }
-        // console.log("header")
-
-        console.log("req.headers", req.headers)
 
         const res = await fetch(
             `${req.headers.get("origin")}/api/chat/createNewChat`,
@@ -25,15 +17,14 @@ export default async function handler(req: Request, res: NextApiResponse) {
             method: "POST",
             headers: {
               "content-Type": "application/json",
-                cookie: req.headers.get("cookie") || "",
+              cookie: req.headers.get("cookie") || ""
             },
             body: JSON.stringify({ message }),
           });
-      
-          const data = await res.json();
 
-        // const chatId = data._id
-    
+        const data = await res.json();
+        const chatId  = data._id
+      
         const stream = await OpenAIEdgeStream(
             "https://api.openai.com/v1/chat/completions", {
                 headers: {
@@ -47,23 +38,28 @@ export default async function handler(req: Request, res: NextApiResponse) {
                     stream: true
                 })
         }, {
+            onBeforeStream: async ({emit}) => {
+                emit(chatId, "newChatId")
+            },
+
             onAfterStream: async ({fullContent}) => {
-                // await fetch(`${req.headers.get("Origin")}/api/chat/addMessage2Chat`, {
-                //     method: "POST",
-                //     headers: {
-                //         "content-type": "application/json",
-                //         cookie: req.headers.get("Cookie") || ""
-                //     },
-                //     body: JSON.stringify({
-                //         // chatId,
-                //         role: "assistant",
-                //         content: fullContent,
-                //     })
-                // })
-            }
+                await fetch(`${req.headers.get("Origin")}/api/chat/addMessage2Chat`, {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/json",
+                        cookie: req.headers.get("Cookie") || ""
+                    },
+                    body: JSON.stringify({
+                        chatId,
+                        role: "assistant",
+                        content: fullContent,
+                    })
+                })
+            }, 
         })
         return new Response(stream)
     } catch (error) {
         console.log("An error ocurred on sendMessage", error)
     }
 }
+
