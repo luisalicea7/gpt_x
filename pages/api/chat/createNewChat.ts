@@ -1,16 +1,18 @@
 import clientPromise from "@/lib/dbconnect";
 import { buildClerkProps, clerkClient, getAuth } from "@clerk/nextjs/server";
 import type { GetServerSideProps, NextApiRequest, NextApiResponse } from "next"
+import { NextRequest } from "next/server";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+
+
   try {
-    const { userId } = await getAuth(req);
+    const { userId } = getAuth(req);
     const { message } = req.body;
 
-    const user = userId;
 
     // Create a new user message
     const newUserMessage = {
@@ -24,7 +26,7 @@ export default async function handler(
     }
     const db = client.db("gptx");
     const chat = await db.collection("chats").insertOne({
-        userId: user,
+        userId,
         messages: [newUserMessage],
         title: message
     });
@@ -38,3 +40,5 @@ export default async function handler(
     res.status(500).json({ error: "An error occurred in createNewChat" });
   }
 }
+
+
