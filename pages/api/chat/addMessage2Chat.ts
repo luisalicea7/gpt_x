@@ -11,8 +11,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           throw new Error("An error ocurred connecting to the database");
         }
         const db = client.db("gptx");
-
         const { chatId, role, content } = req.body;
+
 
         const chat = await db.collection("chats").findOneAndUpdate({
             _id: new ObjectId(chatId),

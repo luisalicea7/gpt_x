@@ -1,5 +1,5 @@
-import { buildClerkProps, clerkClient, getAuth } from "@clerk/nextjs/server";
-import { GetServerSideProps, NextApiRequest, NextApiResponse } from "next";
+import { getAuth } from "@clerk/nextjs/server";
+import { NextApiResponse } from "next";
 import { NextRequest } from "next/server";
 import { OpenAIEdgeStream } from "openai-edge-stream"
 
@@ -12,15 +12,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
 
-
   const { getToken } = getAuth(req);
   const token = await getToken();
   const origin = req.headers.get("origin");
-
-//   const { userId } = getAuth(req);
-//   if (!userId) {
-//     return res.status(401).json({ error: "Not authenticated" });
-//   }
 
   try {
     const { message } = await req.json();
