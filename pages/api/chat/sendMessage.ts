@@ -14,6 +14,7 @@ export default async function handler(
 
   const { getToken } = getAuth(req);
   const token = await getToken();
+  console.log("token", token);
   const origin = req.headers.get("origin");
 
   try {
@@ -70,7 +71,6 @@ export default async function handler(
 } catch (error) {
     console.log("An error ocurred on sendMessage", error)
 }
-  // Retrieve the data from your database
   return res.status(200).json({});
 }
 
