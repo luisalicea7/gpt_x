@@ -34,7 +34,7 @@ export default async function handler(
     const data = await res.json();
     const chatId  = data._id
   
-    
+    // Begin Stream Chat
     const stream = await OpenAIEdgeStream(
         "https://api.openai.com/v1/chat/completions", {
             headers: {
@@ -71,6 +71,7 @@ export default async function handler(
 } catch (error) {
     console.log("An error ocurred on sendMessage", error)
 }
+
   return res.status(200).json({});
 }
 
