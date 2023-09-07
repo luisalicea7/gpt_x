@@ -12,6 +12,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
 
+
+// Get Session token to validate user is signed in
   const { getToken } = getAuth(req);
   const token = await getToken();
   console.log("token", token);
