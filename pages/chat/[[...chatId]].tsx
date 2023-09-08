@@ -5,7 +5,7 @@ import { streamReader } from "openai-edge-stream";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
 
-export default function ChatPage() {
+export default function ChatPage({ chatId }: { chatId: string }) {
   const [messageText, setMessageText] = useState("");
   const [incomingMessage, setIncomingMessage] = useState("");
   const [newChatMessages, setNewChatMessages] = useState<
@@ -76,7 +76,7 @@ export default function ChatPage() {
       </Head>
 
       <div className="grid h-screen grid-cols-[260px_1fr]">
-        <ChatSidebar />
+        <ChatSidebar chatId={chatId} />
         <div className="flex flex-col bg-[#3d3d3d] overflow-hidden">
           <div className="flex-1 text-white overflow-scroll">
             {newChatMessages.map((message) => (
@@ -112,3 +112,12 @@ export default function ChatPage() {
     </>
   );
 }
+
+export const getServerSideProps = async (ctx: any) => {
+  const chatId = ctx.params?.chatId?.[0] || null;
+  return {
+    props: {
+      chatId,
+    },
+  };
+};
