@@ -16,10 +16,36 @@ export default async function handler(
 // Get Session token to validate user is signed in
   const { getToken } = getAuth(req);
   const token = await getToken();
-  console.log("token", token);
   const origin = req.headers.get("origin");
 
   try {
+    // const initialChatMessage = {
+    //     role: "user",
+    //     content: ""
+    // }
+
+    const { chatId: chatIdParam, message } = await req.json();
+    let chatId = chatIdParam;
+    let newChatId: string
+    let chatMessages = []
+
+    if(chatId){ 
+        const res = await fetch(`${origin}/api/chat/addMessage2Chat`, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+                chatId,
+                role: "user",
+                content: message,
+            })
+        })
+        const json = await res.json();
+        chatMessages = json.chat.messages || []
+    } else {
+        
     const { message } = await req.json();
 
     const res = await fetch(
@@ -34,7 +60,25 @@ export default async function handler(
       });
 
     const data = await res.json();
-    const chatId  = data._id
+    chatId = data._id
+    newChatId = data._id
+    chatMessages = data.messages || []
+    }
+
+    const messages2Send = []
+    chatMessages.reverse()
+    let tokensUsed = 0
+    for (let chatMessage of chatMessages) {
+        const messageTokens = chatMessage.content.length / 4
+        tokensUsed = tokensUsed + messageTokens
+        if(tokensUsed <= 2000){
+            messages2Send.push(chatMessage)
+        }else{
+            break
+        }
+    }
+
+    messages2Send.reverse()
   
     // Begin Stream Chat
     const stream = await OpenAIEdgeStream(
@@ -46,12 +90,14 @@ export default async function handler(
             method: "POST",
             body: JSON.stringify({
                 model: "gpt-3.5-turbo",
-                messages: [{content: message, role: "user"}],
+                messages: [...messages2Send],
                 stream: true
             })
     }, {
         onBeforeStream: async ({emit}) => {
-            emit(chatId, "newChatId")
+            if (newChatId) {
+            emit(newChatId, "newChatId")
+            }
         },
 
         onAfterStream: async ({fullContent}) => {

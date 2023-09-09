@@ -29,9 +29,11 @@ export default function ChatPage({
   >([]);
   const [generatingResponse, setGeneratingResponse] = useState(false);
   const [newChatId, setNewChatId] = useState<string | null>(null);
+  const [fullMessage, setFullMessage] = useState("");
 
   const router = useRouter();
 
+  //if new chat redirect to chat dynamic route
   useEffect(() => {
     if (!generatingResponse && newChatId) {
       setNewChatId(null);
@@ -39,10 +41,26 @@ export default function ChatPage({
     }
   }, [newChatId, generatingResponse, router]);
 
+  //update when route changes
   useEffect(() => {
     setNewChatMessages([]);
     setNewChatId(null);
   }, [chatId]);
+
+  //save new streamMessage to new chat messages
+  useEffect(() => {
+    if (!generatingResponse && fullMessage) {
+      setNewChatMessages((prev) => [
+        ...prev,
+        {
+          _id: uuidv4(),
+          role: "assistant",
+          content: fullMessage,
+        },
+      ]);
+      setFullMessage("");
+    }
+  }, [generatingResponse, fullMessage]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,7 +83,7 @@ export default function ChatPage({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: messageText }),
+      body: JSON.stringify({ chatId, message: messageText }),
     });
 
     const data = res.body;
@@ -74,14 +92,17 @@ export default function ChatPage({
     }
 
     const reader = data.getReader();
+    let content = "";
     await streamReader(reader, (message) => {
       console.log("Message: ", message);
       if (message.event === "newChatId") {
         setNewChatId(message.content);
       } else {
         setIncomingMessage((s) => `${s}${message.content}`);
+        content = content + message.content;
       }
     });
+    setFullMessage(content);
     setIncomingMessage("");
     setGeneratingResponse(false);
   };
