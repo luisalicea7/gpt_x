@@ -4,8 +4,20 @@ import { useEffect, useState } from "react";
 import { streamReader } from "openai-edge-stream";
 import { v4 as uuidv4 } from "uuid";
 import { useRouter } from "next/router";
+import { getAuth } from "@clerk/nextjs/server";
+import clientPromise from "@/lib/dbconnect";
+import { ObjectId } from "mongodb";
 
-export default function ChatPage({ chatId }: { chatId: string }) {
+export default function ChatPage({
+  chatId,
+  title,
+  messages = [],
+}: {
+  chatId: string;
+  title: string;
+  messages: [];
+}) {
+  console.log("props: ", title, messages);
   const [messageText, setMessageText] = useState("");
   const [incomingMessage, setIncomingMessage] = useState("");
   const [newChatMessages, setNewChatMessages] = useState<
@@ -26,6 +38,11 @@ export default function ChatPage({ chatId }: { chatId: string }) {
       router.push(`/chat/${newChatId}`);
     }
   }, [newChatId, generatingResponse, router]);
+
+  useEffect(() => {
+    setNewChatMessages([]);
+    setNewChatId(null);
+  }, [chatId]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,9 +82,11 @@ export default function ChatPage({ chatId }: { chatId: string }) {
         setIncomingMessage((s) => `${s}${message.content}`);
       }
     });
-
+    setIncomingMessage("");
     setGeneratingResponse(false);
   };
+
+  const messagesCollection = [...messages, ...newChatMessages];
 
   return (
     <>
@@ -79,7 +98,7 @@ export default function ChatPage({ chatId }: { chatId: string }) {
         <ChatSidebar chatId={chatId} />
         <div className="flex flex-col bg-[#3d3d3d] overflow-hidden">
           <div className="flex-1 text-white overflow-scroll">
-            {newChatMessages.map((message) => (
+            {messagesCollection.map((message) => (
               <Message
                 key={message._id}
                 role={message.role}
@@ -115,9 +134,26 @@ export default function ChatPage({ chatId }: { chatId: string }) {
 
 export const getServerSideProps = async (ctx: any) => {
   const chatId = ctx.params?.chatId?.[0] || null;
+  if (chatId) {
+    const { userId } = await getAuth(ctx.req);
+    const client = await clientPromise;
+    const database = client!.db("gptx");
+    const chat = await database!.collection("chats").findOne({
+      userId,
+      _id: new ObjectId(chatId),
+    });
+    return {
+      props: {
+        chatId,
+        title: chat?.title,
+        messages: chat?.messages.map((message: any[]) => ({
+          ...message,
+          _id: uuidv4(),
+        })),
+      },
+    };
+  }
   return {
-    props: {
-      chatId,
-    },
+    props: {},
   };
 };
