@@ -24,13 +24,14 @@ export default async function handler(
     //     content: ""
     // }
 
-    const { chatId: chatIdParam, message } = await req.json();
+    const requestData = await req.json();
+    const { chatId: chatIdParam, message } = requestData;
     let chatId = chatIdParam;
     let newChatId: string
     let chatMessages = []
 
     if(chatId){ 
-        const res = await fetch(`${origin}/api/chat/addMessage2Chat`, {
+        const fetchRes = await fetch(`${origin}/api/chat/addMessage2Chat`, {
             method: "POST",
             headers: {
                 "content-type": "application/json",
@@ -42,13 +43,15 @@ export default async function handler(
                 content: message,
             })
         })
-        const json = await res.json();
+        const json = await fetchRes.json();
         chatMessages = json.chat.messages || []
-    } else {
+    } 
+    
+    else {
         
-    const { message } = await req.json();
+    // const { message } = await req.json();
 
-    const res = await fetch(
+    const fetchRes = await fetch(
         `${origin}/api/chat/createNewChat`,
         {
         method: "POST",
@@ -59,7 +62,7 @@ export default async function handler(
         body: JSON.stringify({ message }),
       });
 
-    const data = await res.json();
+    const data = await fetchRes.json();
     chatId = data._id
     newChatId = data._id
     chatMessages = data.messages || []
@@ -119,7 +122,5 @@ export default async function handler(
 } catch (error) {
     console.log("An error ocurred on sendMessage", error)
 }
-
-  return res.status(200).json({});
 }
 
