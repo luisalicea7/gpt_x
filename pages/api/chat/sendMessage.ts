@@ -74,7 +74,7 @@ export default async function handler(
     for (let chatMessage of chatMessages) {
         const messageTokens = chatMessage.content.length / 4
         tokensUsed = tokensUsed + messageTokens
-        if(tokensUsed <= 2000){
+        if(tokensUsed <= 4000){
             messages2Send.push(chatMessage)
         }else{
             break
