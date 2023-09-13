@@ -30,8 +30,11 @@ export default function ChatPage({
   const [generatingResponse, setGeneratingResponse] = useState(false);
   const [newChatId, setNewChatId] = useState<string | null>(null);
   const [fullMessage, setFullMessage] = useState("");
+  const [firstChatId, setFirstChatId] = useState<string | null>(chatId);
 
   const router = useRouter();
+
+  const routeChange = chatId !== firstChatId;
 
   //if new chat redirect to chat dynamic route
   useEffect(() => {
@@ -49,7 +52,7 @@ export default function ChatPage({
 
   //save new streamMessage to new chat messages
   useEffect(() => {
-    if (!generatingResponse && fullMessage) {
+    if (!routeChange && !generatingResponse && fullMessage) {
       setNewChatMessages((prev) => [
         ...prev,
         {
@@ -60,11 +63,12 @@ export default function ChatPage({
       ]);
       setFullMessage("");
     }
-  }, [generatingResponse, fullMessage]);
+  }, [generatingResponse, fullMessage, routeChange]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setGeneratingResponse(true);
+    setFirstChatId(chatId);
     setNewChatMessages((prev) => {
       const newChatMessages = [
         ...prev,
@@ -127,8 +131,14 @@ export default function ChatPage({
               />
             ))}
 
-            {!!incomingMessage && (
+            {!!incomingMessage && !routeChange && (
               <Message role="assistant" content={incomingMessage} />
+            )}
+            {!!incomingMessage && !!routeChange && (
+              <Message
+                role="alert"
+                content="Only one message at a time. Allow any other responses to finish before submitting a new one"
+              />
             )}
           </div>
           <footer className="bg-[#333333] p-9">

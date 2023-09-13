@@ -9,7 +9,7 @@ import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-tsx";
 import "prismjs/components/prism-python";
-import "prismjs/themes/prism-twilight.css";
+import "prismjs/themes/prism-okaidia.css";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { useRouter } from "next/router";
 
@@ -130,7 +130,11 @@ export const Message = ({
   return (
     <div
       className={`grid grid-cols-[30px_1fr] gap-2 p-5 ${
-        role === "assistant" ? "bg-[#5C5C5C]" : ""
+        role === "assistant"
+          ? "bg-[#5C5C5C]"
+          : role === "alert"
+          ? "bg-red-500"
+          : ""
       } `}>
       <div>
         {role === "user" && (
@@ -149,7 +153,7 @@ export const Message = ({
           </div>
         )}
       </div>
-      <div className="max-w-none prose prose-invert px-9">
+      <div className="max-w-5xl prose prose-invert px-9">
         <ReactMarkdown components={components}>{content}</ReactMarkdown>
       </div>
     </div>
