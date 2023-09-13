@@ -13,6 +13,13 @@ export default async function handler(
     const { userId } = getAuth(req);
     const { message } = req.body;
 
+    //validate data
+    if (!message || typeof message !== "string" || message.length > 200) {
+      res.status(422).json({
+        message: "Message must be 200 characters or less",
+      })
+      return
+  }
 
     // Create a new user message
     const newUserMessage = {
