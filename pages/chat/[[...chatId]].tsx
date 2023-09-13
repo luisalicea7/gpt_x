@@ -7,6 +7,9 @@ import { useRouter } from "next/router";
 import { getAuth } from "@clerk/nextjs/server";
 import clientPromise from "@/lib/dbconnect";
 import { ObjectId } from "mongodb";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRobot } from "@fortawesome/free-solid-svg-icons";
+import { faLightbulb } from "@fortawesome/free-solid-svg-icons/faLightbulb";
 
 export default function ChatPage({
   chatId,
@@ -123,25 +126,38 @@ export default function ChatPage({
         <ChatSidebar chatId={chatId} />
         <div className="flex flex-col bg-[#3d3d3d] overflow-hidden">
           <div className="flex-1 flex flex-col-reverse text-white overflow-scroll">
-            <div className="mb-auto">
-              {messagesCollection.map((message) => (
-                <Message
-                  key={message._id}
-                  role={message.role}
-                  content={message.content}
+            {!messagesCollection.length && !incomingMessage && (
+              <div className="m-auto justify-center flex flex-col items-center text-center">
+                <FontAwesomeIcon
+                  icon={faLightbulb}
+                  className="text-6xl text-white"
                 />
-              ))}
+                <h1 className="text-4xl font-bold text-white/50 mt-2">
+                  Ask me your question
+                </h1>
+              </div>
+            )}
+            {!!messagesCollection.length && (
+              <div className="mb-auto">
+                {messagesCollection.map((message) => (
+                  <Message
+                    key={message._id}
+                    role={message.role}
+                    content={message.content}
+                  />
+                ))}
 
-              {!!incomingMessage && !routeChange && (
-                <Message role="assistant" content={incomingMessage} />
-              )}
-              {!!incomingMessage && !!routeChange && (
-                <Message
-                  role="alert"
-                  content="Only one message at a time. Allow any other responses to finish before submitting a new one"
-                />
-              )}
-            </div>
+                {!!incomingMessage && !routeChange && (
+                  <Message role="assistant" content={incomingMessage} />
+                )}
+                {!!incomingMessage && !!routeChange && (
+                  <Message
+                    role="alert"
+                    content="Only one message at a time. Allow any other responses to finish before submitting a new one"
+                  />
+                )}
+              </div>
+            )}
           </div>
           <footer className="bg-[#333333] p-9">
             <form onSubmit={handleSubmit}>
