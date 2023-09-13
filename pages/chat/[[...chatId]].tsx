@@ -184,17 +184,36 @@ export default function ChatPage({
 export const getServerSideProps = async (ctx: any) => {
   const chatId = ctx.params?.chatId?.[0] || null;
   if (chatId) {
+    let objectId;
+
+    try {
+      objectId = new ObjectId(chatId);
+    } catch (error) {
+      return {
+        redirect: {
+          destination: "/chat",
+        },
+      };
+    }
     const { userId } = await getAuth(ctx.req);
     const client = await clientPromise;
     const database = client!.db("gptx");
     const chat = await database!.collection("chats").findOne({
       userId,
-      _id: new ObjectId(chatId),
+      _id: objectId,
     });
+
+    if (!chat) {
+      return {
+        redirect: {
+          destination: "/chat",
+        },
+      };
+    }
     return {
       props: {
         chatId,
-        title: chat?.title,
+        title: chat!.title,
         messages: chat?.messages.map((message: any[]) => ({
           ...message,
           _id: uuidv4(),

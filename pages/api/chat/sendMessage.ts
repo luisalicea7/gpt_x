@@ -26,6 +26,17 @@ export default async function handler(
 
     const requestData = await req.json();
     const { chatId: chatIdParam, message } = requestData;
+
+    //validate data
+    if (!message || typeof message !== "string" || message.length > 200) {
+        return new Response(JSON.stringify({
+            message: "Message must be 200 characters or less",
+        }), {
+            status: 422,
+        });
+        
+    }
+
     let chatId = chatIdParam;
     let newChatId: string
     let chatMessages = []
@@ -120,6 +131,11 @@ export default async function handler(
     })
     return new Response(stream)
 } catch (error) {
+    return new Response(JSON.stringify({
+        message: "An error ocurred on sendMessage",
+    }), {
+        status: 500,
+    });
     console.log("An error ocurred on sendMessage", error)
 }
 }
