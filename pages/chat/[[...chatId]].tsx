@@ -122,24 +122,26 @@ export default function ChatPage({
       <div className="grid h-screen grid-cols-[260px_1fr]">
         <ChatSidebar chatId={chatId} />
         <div className="flex flex-col bg-[#3d3d3d] overflow-hidden">
-          <div className="flex-1 text-white overflow-scroll">
-            {messagesCollection.map((message) => (
-              <Message
-                key={message._id}
-                role={message.role}
-                content={message.content}
-              />
-            ))}
+          <div className="flex-1 flex flex-col-reverse text-white overflow-scroll">
+            <div className="mb-auto">
+              {messagesCollection.map((message) => (
+                <Message
+                  key={message._id}
+                  role={message.role}
+                  content={message.content}
+                />
+              ))}
 
-            {!!incomingMessage && !routeChange && (
-              <Message role="assistant" content={incomingMessage} />
-            )}
-            {!!incomingMessage && !!routeChange && (
-              <Message
-                role="alert"
-                content="Only one message at a time. Allow any other responses to finish before submitting a new one"
-              />
-            )}
+              {!!incomingMessage && !routeChange && (
+                <Message role="assistant" content={incomingMessage} />
+              )}
+              {!!incomingMessage && !!routeChange && (
+                <Message
+                  role="alert"
+                  content="Only one message at a time. Allow any other responses to finish before submitting a new one"
+                />
+              )}
+            </div>
           </div>
           <footer className="bg-[#333333] p-9">
             <form onSubmit={handleSubmit}>

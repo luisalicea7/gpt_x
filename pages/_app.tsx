@@ -9,8 +9,13 @@ import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { Open_Sans } from "next/font/google";
 
 config.autoAddCss = false;
+const opensans = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-os",
+});
 
 const publicPages = ["/sign-in/[[...index]]", "/sign-up/[[...index]]", "/"];
 
@@ -26,11 +31,15 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <ClerkProvider {...pageProps}>
       {isPublicPage ? (
-        <Component {...pageProps} />
+        <main className={`$ opensans.variable}`}>
+          <Component {...pageProps} />
+        </main>
       ) : (
         <>
           <SignedIn>
-            <Component {...pageProps} />
+            <main className={`$ opensans.variable} font-body`}>
+              <Component {...pageProps} />
+            </main>
           </SignedIn>
           <SignedOut>
             <RedirectToSignIn />
