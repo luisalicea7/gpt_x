@@ -11,11 +11,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           throw new Error("An error ocurred connecting to the database");
         }
         const db = client.db("gptx");
+
         const { chatId, role, content } = req.body;
+
+    //validate chatId
+    let objectId;
+
+    try {
+      objectId = new ObjectId(chatId);
+    } catch (error) {
+      res.status(422).json({
+        message: "Invalid chatId",
+      })
+      return
+    }
+
+    //validate content data
+    if (!content || typeof content !== "string" || (role === 'user' && content.length > 200) || (role === 'assistant' && content.length > 200000)) {
+        res.status(422).json({
+          message: "Content is required and must be 200 characters or less",
+        })
+        return
+    }
+
+    //validate role
+    if (role !== "user" && role !== "assistant") {
+            res.status(422).json({
+              message: "Invalid role",
+            })
+            return
+    }
 
 
         const chat = await db.collection("chats").findOneAndUpdate({
-            _id: new ObjectId(chatId),
+            _id: objectId,
             userId: userId
         }, {
             $push: {
