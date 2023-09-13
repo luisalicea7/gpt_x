@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+### Update Sept 2023: Project is ready to be deployed. Mobile Responsiveness is the only big part missing. Also some new features are coming like deleteChat and the ability to change between GPT3.5 and GPT4 models.
+
 ### Development in process by Luis R. Alicea Ortiz
 
 ### As part of developer portfolio
